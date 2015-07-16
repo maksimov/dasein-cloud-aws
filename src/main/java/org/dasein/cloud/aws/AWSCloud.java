@@ -38,6 +38,7 @@ import org.dasein.cloud.aws.admin.AWSAdminServices;
 import org.dasein.cloud.aws.compute.EC2ComputeServices;
 import org.dasein.cloud.aws.compute.EC2Exception;
 import org.dasein.cloud.aws.compute.EC2Method;
+import org.dasein.cloud.aws.container.ElasticContainerServices;
 import org.dasein.cloud.aws.identity.AWSIdentityServices;
 import org.dasein.cloud.aws.identity.IAMMethod;
 import org.dasein.cloud.aws.network.EC2NetworkServices;
@@ -520,6 +521,14 @@ public class AWSCloud extends AbstractCloud {
         return new EC2ComputeServices(this);
     }
 
+    @Override
+    public ElasticContainerServices getContainerServices() {
+        if( getEC2Provider().isStorage() ) {
+            return null;
+        }
+        return new ElasticContainerServices(this);
+    }
+
     static public final String DSN_ACCESS_KEY = "accessKey";
 
     @Override
@@ -621,6 +630,10 @@ public class AWSCloud extends AbstractCloud {
 
     public String getCloudWatchVersion() {
         return "2010-08-01";
+    }
+
+    public String getEcsVersion() {
+        return "2014-11-13";
     }
 
     public String getEc2Version() {
@@ -737,62 +750,32 @@ public class AWSCloud extends AbstractCloud {
         Map<String, String> parameters = new HashMap<String, String>();
 
         parameters.put(P_ACTION, action);
-//        parameters.put(P_SIGNATURE_VERSION, SIGNATURE_V4);
-//        try {
-//            byte[][] keys = getAccessKey();
-//
-//            parameters.put(P_ACCESS, new String(keys[0], "utf-8"));
-//        } catch( UnsupportedEncodingException e ) {
-//            logger.error(e);
-//            e.printStackTrace();
-//            throw new InternalException(e);
-//        }
-//        parameters.put(P_SIGNATURE_METHOD, EC2_ALGORITHM);
-//        parameters.put(P_TIMESTAMP, getTimestamp(System.currentTimeMillis(), true));
         parameters.put(P_VERSION, version);
         return parameters;
     }
     
     private @Nonnull Map<String, String> getElbParameters( @Nonnull ProviderContext ctx, @Nonnull String action ) throws InternalException {
-		Map<String, String> parameters = getStandardParameters(ctx, action);
-
-		parameters.put(P_VERSION, getElbVersion());
-		return parameters;
+		return getStandardParameters(ctx, action, getElbVersion());
 	}
 
     public Map<String, String> getStandardCloudWatchParameters( ProviderContext ctx, String action ) throws InternalException {
-        Map<String, String> parameters = getStandardParameters(ctx, action);
-
-        parameters.put(P_VERSION, getCloudWatchVersion());
-        return parameters;
+        return getStandardParameters(ctx, action, getCloudWatchVersion());
     }
 
     public Map<String, String> getStandardRdsParameters( ProviderContext ctx, String action ) throws InternalException {
-        Map<String, String> parameters = getStandardParameters(ctx, action);
-
-        parameters.put(P_VERSION, getRdsVersion());
-        return parameters;
+        return getStandardParameters(ctx, action, getRdsVersion());
     }
 
     public Map<String, String> getStandardSimpleDBParameters( ProviderContext ctx, String action ) throws InternalException {
-        Map<String, String> parameters = getStandardParameters(ctx, action);
-
-        parameters.put(P_VERSION, getSdbVersion());
-        return parameters;
+        return getStandardParameters(ctx, action, getSdbVersion());
     }
 
     public Map<String, String> getStandardSnsParameters( ProviderContext ctx, String action ) throws InternalException {
-        Map<String, String> parameters = getStandardParameters(ctx, action);
-
-        parameters.put(P_VERSION, getSnsVersion());
-        return parameters;
+        return getStandardParameters(ctx, action, getSnsVersion());
     }
 
     public Map<String, String> getStandardSqsParameters( ProviderContext ctx, String action ) throws InternalException {
-        Map<String, String> parameters = getStandardParameters(ctx, action);
-
-        parameters.put(P_VERSION, getSqsVersion());
-        return parameters;
+        return getStandardParameters(ctx, action, getSqsVersion());
     }
 
     public static void addExtraParameters( Map<String, String> parameters, Map<String, String> extraParameters ) {

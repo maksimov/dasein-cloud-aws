@@ -278,6 +278,14 @@ public class EC2Method {
     static public final String CANCEL_SPOT_INSTANCE_REQUESTS       = "CancelSpotInstanceRequests";
     static public final String DESCRIBE_SPOT_PRICE_HISTORY         = "DescribeSpotPriceHistory";
 
+    // Container operations
+    static public final String CREATE_CLUSTER = "CreateCluster";
+    static public final String DESCRIBE_CLUSTERS = "DescribeClusters";
+    static public final String DELETE_CLUSTER = "DeleteCluster";
+    static public final String CREATE_SERVICE = "CreateServices";
+    static public final String DESCRIBE_SERVICES = "DescribeServices";
+    static public final String DELETE_SERVICE = "DeleteService";
+
 
     static public @Nonnull ServiceAction[] asEC2ServiceAction( @Nonnull String action ) {
         // TODO: implement me
