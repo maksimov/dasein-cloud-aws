@@ -21,7 +21,7 @@ package org.dasein.cloud.aws.container;
 
 import org.dasein.cloud.AbstractCapabilities;
 import org.dasein.cloud.aws.AWSCloud;
-import org.dasein.cloud.container.ContainerCapabilities;
+import org.dasein.cloud.compute.container.ContainerCapabilities;
 
 import javax.annotation.Nonnull;
 import java.util.Locale;

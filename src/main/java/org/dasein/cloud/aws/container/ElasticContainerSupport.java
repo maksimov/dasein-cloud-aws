@@ -25,12 +25,9 @@ import org.dasein.cloud.InternalException;
 import org.dasein.cloud.aws.AWSCloud;
 import org.dasein.cloud.aws.compute.EC2Exception;
 import org.dasein.cloud.aws.compute.EC2Method;
-import org.dasein.cloud.aws.identity.IAMMethod;
-import org.dasein.cloud.container.AbstractContainerSupport;
-import org.dasein.cloud.container.Cluster;
-import org.dasein.cloud.container.ContainerCapabilities;
-import org.dasein.cloud.identity.CloudGroup;
-import org.dasein.cloud.identity.CloudPermission;
+import org.dasein.cloud.compute.container.AbstractContainerSupport;
+import org.dasein.cloud.compute.container.Cluster;
+import org.dasein.cloud.compute.container.ContainerCapabilities;
 import org.dasein.cloud.util.APITrace;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -52,7 +49,7 @@ public class ElasticContainerSupport extends AbstractContainerSupport<AWSCloud> 
 
     private volatile transient EcsCapabilities capabilities;
 
-    protected ElasticContainerSupport(AWSCloud provider) {
+    public ElasticContainerSupport(AWSCloud provider) {
         super(provider);
     }
 
@@ -73,7 +70,27 @@ public class ElasticContainerSupport extends AbstractContainerSupport<AWSCloud> 
     @Nonnull
     @Override
     public Iterable<Cluster> listClusters() throws CloudException, InternalException {
-        return super.listClusters();
+        APITrace.begin(getProvider(), "Containers.listClusters");
+        try {
+            Map<String,String> parameters = getProvider().getStandardParameters(getContext(), EC2Method.DESCRIBE_CLUSTERS, getProvider().getEcsVersion());
+            List<Cluster> results = new ArrayList<Cluster>();
+            EC2Method method = new EC2Method(SERVICE_ID, getProvider(), parameters);
+            try {
+                Document doc = method.invoke();
+                NodeList blocks = doc.getElementsByTagName("member");
+                for( int i=0; i<blocks.getLength(); i++ ) {
+                    results.add(toCluster(blocks.item(i)));
+                }
+            }
+            catch( EC2Exception e ) {
+                logger.error(e.getSummary());
+                throw new CloudException(e);
+            }
+            return results;
+        }
+        finally {
+            APITrace.end();
+        }
     }
 
     @Nonnull
@@ -160,7 +177,7 @@ public class ElasticContainerSupport extends AbstractContainerSupport<AWSCloud> 
             return null;
         }
         NodeList attributes = item.getChildNodes();
-        String clusterId = null, name = null, status = null;
+        String clusterId = null, name = null, status = null, ownerId = null;
 
         for( int i=0; i<attributes.getLength(); i++ ) {
             Node attribute = attributes.item(i);
@@ -179,7 +196,11 @@ public class ElasticContainerSupport extends AbstractContainerSupport<AWSCloud> 
         if( name == null || clusterId == null ) {
             return null;
         }
-        return new Cluster(clusterId, name);
+        String[] parts = clusterId.split(":");
+        if( parts.length > 5 ) {
+            ownerId = parts[4];
+        }
+        return new Cluster(clusterId, name, ownerId);
     }
 
     @Override

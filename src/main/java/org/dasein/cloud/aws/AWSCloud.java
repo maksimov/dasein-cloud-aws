@@ -24,7 +24,6 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.http.*;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.GzipDecompressingEntity;
-import org.apache.http.client.utils.URIUtils;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -38,14 +37,12 @@ import org.dasein.cloud.aws.admin.AWSAdminServices;
 import org.dasein.cloud.aws.compute.EC2ComputeServices;
 import org.dasein.cloud.aws.compute.EC2Exception;
 import org.dasein.cloud.aws.compute.EC2Method;
-import org.dasein.cloud.aws.container.ElasticContainerServices;
 import org.dasein.cloud.aws.identity.AWSIdentityServices;
 import org.dasein.cloud.aws.identity.IAMMethod;
 import org.dasein.cloud.aws.network.EC2NetworkServices;
 import org.dasein.cloud.aws.network.ELBMethod;
 import org.dasein.cloud.aws.platform.AWSPlatformServices;
 import org.dasein.cloud.aws.storage.AWSCloudStorageServices;
-import org.dasein.cloud.aws.storage.S3Method;
 import org.dasein.cloud.compute.ComputeServices;
 import org.dasein.cloud.compute.VirtualMachineSupport;
 import org.dasein.cloud.platform.KeyValuePair;
@@ -519,14 +516,6 @@ public class AWSCloud extends AbstractCloud {
             return null;
         }
         return new EC2ComputeServices(this);
-    }
-
-    @Override
-    public ElasticContainerServices getContainerServices() {
-        if( getEC2Provider().isStorage() ) {
-            return null;
-        }
-        return new ElasticContainerServices(this);
     }
 
     static public final String DSN_ACCESS_KEY = "accessKey";
