@@ -309,6 +309,8 @@
                             <value>${test.shareAccount}</value>
                         </property>
                     </systemProperties>
+                    <forkCount>0</forkCount>
+                    <reuseForks>false</reuseForks>
                     <includes>
                         <include>**/TestSuite.class</include>
                     </includes>
