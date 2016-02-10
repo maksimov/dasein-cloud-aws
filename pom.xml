@@ -103,6 +103,11 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.5.4</version>
         </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>2.5.4</version>
+        </dependency>
         <!--<dependency>-->
             <!--<groupId>com.fasterxml.jackson.dataformat</groupId>-->
             <!--<artifactId>jackson-dataformat-yaml</artifactId>-->
@@ -298,6 +303,8 @@
                             <value>${test.shareAccount}</value>
                         </property>
                     </systemProperties>
+                    <forkCount>0</forkCount>
+                    <reuseForks>false</reuseForks>
                     <includes>
                         <include>**/TestSuite.class</include>
                     </includes>
